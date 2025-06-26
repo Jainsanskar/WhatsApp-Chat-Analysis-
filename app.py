@@ -53,9 +53,31 @@ if uploaded_file is not None:
 
         st.markdown("---")
 
+        # 2. Wordcloud
+        st.markdown("## \u2601\ufe0f Wordcloud")
+        df_wc = helper.create_wordcloud(selected_user, df)
+        fig, ax = plt.subplots()
+        ax.imshow(df_wc)
+        ax.axis("off")
+        st.pyplot(fig)
+
+
+        # 3. Most Common Words
+        most_common_df = helper.most_common_words(selected_user, df)
+        if not most_common_df.empty:
+            st.markdown("## \U0001F5E3\ufe0f Most Common Words")
+            fig, ax = plt.subplots(figsize=(8, 5))
+            sns.barplot(y=most_common_df[0], x=most_common_df[1], palette="magma", ax=ax)
+            ax.bar_label(ax.containers[0], fmt='%d', fontsize=10)
+            ax.set_xlabel("Frequency")
+            ax.set_ylabel("Words")
+            plt.tight_layout()
+            st.pyplot(fig)
+        else:
+            st.info("No common words found.")
 
         # -----------------------------
-        # 5. Emoji Analysis
+        # 4. Emoji Analysis
         # -----------------------------
         st.markdown("## 😀 Emoji Analysis")
         emoji_df = helper.emoji_helper(selected_user, df)
@@ -68,7 +90,7 @@ if uploaded_file is not None:
 
         st.markdown("---")
 
-        # 6. Monthly Timeline
+        # 5. Monthly Timeline
         st.markdown("## 📆 Monthly Timeline")
         timeline = helper.monthly_timeline(selected_user, df)
         fig, ax = plt.subplots(figsize=(10, 4))
@@ -80,7 +102,7 @@ if uploaded_file is not None:
         plt.xticks(rotation=45)
         st.pyplot(fig)
 
-        # 7. Daily Timeline
+        # 6. Daily Timeline
         st.markdown("## 📅 Daily Timeline")
         daily_timeline = helper.daily_timeline(selected_user, df)
         fig, ax = plt.subplots(figsize=(10, 4))
@@ -92,7 +114,7 @@ if uploaded_file is not None:
         plt.xticks(rotation=45)
         st.pyplot(fig)
 
-        # 8. Activity Map (Weekday and Month)
+        # 7. Activity Map (Weekday and Month)
         st.markdown("## 📊 Activity Map")
         col1, col2 = st.columns(2)
 
@@ -118,7 +140,7 @@ if uploaded_file is not None:
             ax.grid(True, axis='y', linestyle='--', alpha=0.5)
             st.pyplot(fig)
 
-        # 9. Weekly Activity Heatmap
+        # 8. Weekly Activity Heatmap
         st.markdown("## 🔥 Weekly Activity Heatmap")
         user_heatmap = helper.activity_heatmap(selected_user, df)
         fig, ax = plt.subplots(figsize=(12, 5))
@@ -128,7 +150,7 @@ if uploaded_file is not None:
         ax.set_ylabel("Day of Week")
         st.pyplot(fig)
 
-        # 10. Most active time period
+        # 9. Most active time period
         st.markdown("## ⏰ Most Active Time Period")
         active_period = df['period'].value_counts().head(10)
         fig, ax = plt.subplots()
