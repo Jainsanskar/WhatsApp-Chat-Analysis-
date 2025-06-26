@@ -46,5 +46,21 @@ def preprocess(data):
         end = pd.to_datetime(str(end_hour), format='%H').strftime('%I %p')
         period.append(f"{start} - {end}")
     df['period'] = period
+    
+    # # Remove empty, whitespace-only, or 'null' messages
+    # df = df[df['message'].notna()]
+    # df = df[df['message'].str.strip() != '']
+    # df = df[~df['message'].str.lower().eq('null')]
+
+    #    # Clean message text early
+    df['message'] = df['message'].astype(str).str.strip()
+
+    # Remove empty or null-like messages
+    stop_words = [
+        '', 'null', 'None', '<Media omitted>', 
+        'Messages and calls are end-to-end encrypted',
+        'This message was deleted'
+    ]
+    df = df[~df['message'].str.lower().isin([w.lower() for w in stop_words])]
 
     return df

@@ -1,6 +1,7 @@
 from urlextract import URLExtract
 import emoji
 import pandas as pd
+from wordcloud import WordCloud, STOPWORDS
 
 extract = URLExtract()
 
@@ -44,3 +45,44 @@ def most_busy_users(df):
     df = round((df['user'].value_counts() / df.shape[0]) * 100, 2).reset_index().rename(
         columns={'index': 'name', 'user': 'percent'})
     return x,df
+
+
+def create_wordcloud(selected_user, df):
+    # Load custom Hinglish stop words
+    with open('stop_hinglish.txt', 'r', encoding='utf-8') as f:
+        custom_stopwords = set(f.read().split())
+
+    # Combine with WordCloud's built-in stopwords
+    all_stopwords = STOPWORDS.union(custom_stopwords)
+
+    # Filter messages for selected user
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+
+    # Clean and filter messages
+    df = df[df['message'].notna()]
+    df = df[~df['message'].str.lower().isin(['null', '<media omitted>', '', 'messages and calls are end-to-end encrypted', 'this message was deleted'])]
+    df = df[df['user'] != 'group_notification']
+
+    # Remove stopwords from messages
+    def clean_message(message):
+        words = [word for word in message.lower().split() if word not in all_stopwords]
+        return " ".join(words)
+
+    df['cleaned_message'] = df['message'].astype(str).apply(clean_message)
+
+    # Generate WordCloud
+    wc = WordCloud(
+        width=600,
+        height=400,
+        min_font_size=10,
+        background_color='white',
+        colormap='viridis',
+        max_words=150,
+        stopwords=all_stopwords,
+        contour_color='steelblue',
+        contour_width=1
+    )
+
+    text = df['cleaned_message'].str.cat(sep=" ")
+    return wc.generate(text)
