@@ -88,3 +88,30 @@ if uploaded_file is not None:
         fig,ax = plt.subplots()
         ax.imshow(df_wc)
         st.pyplot(fig)
+
+        # Most common words
+        most_common_df = helper.most_common_words(selected_user, df)
+
+        if not most_common_df.empty:
+            st.title('Most Common Words')
+
+            fig, ax = plt.subplots(figsize=(8, 5))
+            sns.set_style("whitegrid")
+
+            # Plot horizontal bar chart
+            sns.barplot(
+                y=most_common_df[0],
+                x=most_common_df[1],
+                palette="magma",
+                ax=ax
+            )
+
+            ax.set_xlabel("Frequency", fontsize=12)
+            ax.set_ylabel("Words", fontsize=12)
+            ax.set_title("Top 20 Most Common Words", fontsize=14)
+            ax.bar_label(ax.containers[0], fmt='%d', label_type='edge', fontsize=10)
+            plt.tight_layout()
+
+            st.pyplot(fig)
+        else:
+            st.write("No words to display.")
