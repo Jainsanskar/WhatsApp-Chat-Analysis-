@@ -1,5 +1,7 @@
 import streamlit as st
 import preprocessor, helper
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 st.sidebar.title("Whatsapp Chat Analyzer")
 
@@ -50,3 +52,32 @@ if uploaded_file is not None:
         with col6:
             st.header("Days Since Talking")
             st.title(chat_days)
+
+         # finding the busiest users in the group(Group level)
+        if selected_user == 'Overall':
+            st.title('Most Busy Users')
+
+            x, new_df = helper.most_busy_users(df)
+
+            # Use seaborn styling
+            fig, ax = plt.subplots(figsize=(8, 6))
+            sns.set_style("whitegrid")
+
+            col1, col2 = st.columns(2)
+
+            with col1:
+                sns.barplot(x=x.index, y=x.values, palette='Reds_r', ax=ax)
+
+                # Display count labels on top of bars
+                for i, v in enumerate(x.values):
+                    ax.text(i, v + 1, str(v), ha='center', fontweight='bold', fontsize=9)
+
+                ax.set_title("Top Active Users", fontsize=14)
+                ax.set_xlabel("User", fontsize=12)
+                ax.set_ylabel("Message Count", fontsize=12)
+                plt.xticks(rotation=45)
+                st.pyplot(fig)
+
+            with col2:
+                st.subheader("Message % Breakdown")
+                st.dataframe(new_df)

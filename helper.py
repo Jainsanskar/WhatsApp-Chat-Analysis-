@@ -36,3 +36,11 @@ def fetch_stats(selected_user, df):
     duration_days = (end_date - start_date).days + 1  # +1 to include both ends
 
     return num_messages, len(words), num_media_messages, len(links), emoji_count, duration_days
+
+
+# function to fetuch most busy user
+def most_busy_users(df):
+    x = df['user'].value_counts().head()
+    df = round((df['user'].value_counts() / df.shape[0]) * 100, 2).reset_index().rename(
+        columns={'index': 'name', 'user': 'percent'})
+    return x,df
